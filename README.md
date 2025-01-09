@@ -25,13 +25,12 @@ To deploy a contract:
 
 The contract's address on testnet and ABI are stored in `deployed-contract.json`.
 
-To send a transaction:
+To call contract's functions:
 
-```npx hardhat --network subevm run scripts/callF.ts```
+```npx hardhat --network subevm run scripts/callBounded.ts```
 
-To read the value from the contract:
+```npx hardhat --network subevm run scripts/callUnbounded.ts```
 
-```npx hardhat --network subevm run scripts/readA.ts```
 
 Use [this block explorer](https://evm-testscan.dev.opentensor.ai) to track transactions on-chain.
 
@@ -41,3 +40,5 @@ pip install -r requirements.txt
 python3 python_scripts/filter_transactions.py arg_name
 ```
 Where `arg_name` is either `bounded`(tracks calls to `checkpointBounded(bytes32)`) or `unbounded`(tracks calls to `checkpointUnbounded(bytes)`).
+The script searches through the most recent 50 blocks. If you need more, edit the script code.
+Script stores results in a file `transactions.csv`.
