@@ -38,5 +38,6 @@ Use [this block explorer](https://evm-testscan.dev.opentensor.ai) to track trans
 # Running the Python script for fetching contract calls
 ```
 pip install -r requirements.txt
-python3 python_scripts/filter_transactions.py
+python3 python_scripts/filter_transactions.py arg_name
 ```
+Where `arg_name` is either `bounded`(tracks calls to `checkpointBounded(bytes32)`) or `unbounded`(tracks calls to `checkpointUnbounded(bytes)`).

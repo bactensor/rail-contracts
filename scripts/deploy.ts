@@ -2,11 +2,11 @@ import { ethers } from "hardhat";
 import fs from "fs";
 
 async function main() {
-  const c = await ethers.deployContract("C", []);
+  const c = await ethers.deployContract("Checkpoint", []);
   await c.waitForDeployment();
 
   console.log(
-    `C deployed to ${c.target}`
+    `Checkpoint deployed to ${c.target}`
   );
 
   // Save deployment address and ABI
