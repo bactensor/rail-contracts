@@ -42,8 +42,6 @@ def main(signature):
             block = w3.eth.get_block(block_number, full_transactions=True)
             for tx in block.transactions:
                 if tx['to'] == address and tx['input'].to_0x_hex()[:10] == function_selector:
-                    # Skip function selector (10 characters) + encoded length (which uses 32 bytes - another 64 characters)
-                    print(tx['input'].to_0x_hex())
                     argument = tx['input'].to_0x_hex()[BYTES_TO_SKIP[signature]:]  
                     sender = tx['from']
 
