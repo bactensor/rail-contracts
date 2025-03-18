@@ -4,6 +4,7 @@ python_scripts/transactions.csv
 
 node_modules
 .env
+.venv
 
 # Hardhat files
 /cache
