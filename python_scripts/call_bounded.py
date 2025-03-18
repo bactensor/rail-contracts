@@ -13,7 +13,7 @@ from common import (
 
 
 def call_bounded(w3, account, contract_address, data: bytes):
-    """Call `unbounded` contract call.
+    """Call `bounded` contract call.
 
     Args:
         w3: Web3 instance
