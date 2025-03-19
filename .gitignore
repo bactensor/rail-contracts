@@ -1,6 +1,5 @@
 ethPrivateKey.json
 transactions.csv
-deployed-contract.json
 python_scripts/transactions.csv
 
 node_modules
