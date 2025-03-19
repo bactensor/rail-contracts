@@ -6,7 +6,7 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
 
 - **Deployed by**: A subnet owner  
 - **Used by**: Miners & validators  
-- **Access**: Data is visible via block explorers or via [`filter_transactions.py`](python_scripts/filter_transactions.py).  
+- **Access**: Data is visible via block explorers or via [`python_scripts/filter_transactions.py`](python_scripts/filter_transactions.py).  
 - **Wallet requirement**:  
   - Users need an **H160 wallet** (Bittensor EVM-compatible).  
   - The **H160 must be linked to an SS58 hotkey**.  
@@ -22,6 +22,19 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
 ### Funding the Wallet  
 - Follow **Step 3** in the [Metamask Setup Guide](https://docs.bittensor.com/evm-tutorials/evm-mainnet-with-metamask-wallet).  
 - CLI-based funding method is being researched.  
+
+## EVM Devnet
+  
+- The repo is **pre-configured for EVM Devnet**:
+  ```sh
+  RPC_URL=https://evm-testnet.dev.opentestnet.ai
+  ```
+- **Devnet limitation**: Only the **last 256 blocks** are accessible. If `filter_transactions.py` does not return older data, this is expected.  
+
+- **Devnet block explorer**: Checkout already deployed [devnet contract](https://evm-testscan.dev.opentensor.ai/address/0xBA1DbF6d0847Fbc46bFE2A0375dB03257fE1D9a0).
+  Its abi can be found in [`deployed-contract.json`](deployed-contract.json)
+
+- **Devnet funds**: You need to have some TAO to deploy and send transactions. You can get devnet TAO from the [faucet](https://evm-testnet.dev.opentensor.ai/faucet).
 
 ## Deployment  
 
@@ -40,12 +53,15 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
 ### Storing Data (Bounded)  
 
 ```sh
+export RPC_URL=https://evm-testnet.dev.opentensor.ai
+export PRIVATE_KEY=<your_private_key>
+
 pip install -r requirements.txt
 python3 python_scripts/call_bounded.py <contract address> <data>
 ```
 - `<data>` must be **at most 32 bytes** long.
 - Calls the **`checkpointBounded(bytes32)`** function of the smart contract.
-- Data will be stored **on-chain** and can be retrieved using [`filter_transactions.py`](./python_scripts/filter_transactions.py).
+- Data will be stored **on-chain** and can be retrieved using [`filter_transactions.py`](#fetching-contract-calls).
 
 
 ### Storing Data (Unbounded)  
@@ -59,13 +75,10 @@ python3 python_scripts/call_unbounded.py <contract address> <data>
 ```
 - `<data>` can be **any length** (higher gas cost for larger data).
 - Calls the **`checkpointUnbounded(bytes)`** function of the smart contract.
-- Data will be stored **on-chain** and can be retrieved using [`filter_transactions.py`](./python_scripts/filter_transactions.py).
+- Data will be stored **on-chain** and can be retrieved using [`filter_transactions.py`](#fetching-contract-calls).
 
 ### Fetching contract calls
 ```
-export RPC_URL=https://evm-testnet.dev.opentensor.ai
-export PRIVATE_KEY=<your_private_key>
-
 pip install -r requirements.txt
 python3 python_scripts/filter_transactions.py <contract address> <bounded|unbounded>
 ```
@@ -73,17 +86,6 @@ Where `bounded` tracks calls to `checkpointBounded(bytes32)` and `unbounded` tra
 The script searches through the most recent 256 blocks. Decrease it in the script to get results faster. 
 Script stores results in a file `transactions.csv`.
 
-
-## EVM Devnet
-  
-- The repo is **pre-configured for EVM Devnet**:
-  ```sh
-  RPC_URL=https://evm-testnet.dev.opentestnet.ai
-  ```
-- **Devnet limitation**: Only the **last 256 blocks** are accessible. If `filter_transactions.py` does not return older data, this is expected.  
-
-- **Devnet block explorer**: Checkout already deployed [devnet contract](https://evm-testscan.dev.opentensor.ai/address/0xBA1DbF6d0847Fbc46bFE2A0375dB03257fE1D9a0).
-  Its abi can be found in [`deployed-contract.json`](deployed-contract.json)
 
 # Hardcat and npx deployment
 
