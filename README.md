@@ -76,9 +76,9 @@ Script stores results in a file `transactions.csv`.
 
 ## EVM Devnet
   
-- The repo is **pre-configured for EVM Testnet**:  
+- The repo is **pre-configured for EVM Devnet**:
   ```sh
-  RPC: https://evm-testnet.dev.opentestnet.ai
+  RPC_URL=https://evm-testnet.dev.opentestnet.ai
   ```
 - **Devnet limitation**: Only the **last 256 blocks** are accessible. If `filter_transactions.py` does not return older data, this is expected.  
 
