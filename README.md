@@ -104,7 +104,8 @@ npm install
 ```
 
 ## Compiling the contract and interacting with it
-To compile the contract and run scripts, you need to provide your own private H160 private key for Bittensor. That's a 40 hex digit string prefixed with `0x`. Put it into the `ethPrivateKey.json` file. You can create an account using [MetaMask](https://docs.bittensor.com/evm-tutorials/evm-testnet-with-metamask-wallet).
+To compile the contract and run scripts, you need to provide your own private H160 private key for Bittensor. That's a 64 hex digit string not prefixed with `0x`.
+Put it into the `ethPrivateKey.json` file. You can create an account using [MetaMask](https://docs.bittensor.com/evm-tutorials/evm-testnet-with-metamask-wallet).
 
 You need to have some TAO to deploy and send transactions. You can get testnet TAO from [here.](https://evm-testnet.dev.opentensor.ai/faucet)
 
