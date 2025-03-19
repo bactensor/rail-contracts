@@ -40,6 +40,7 @@ def get_account():
         sys.exit(1)
     return Account.from_key(private_key)
 
+
 def validate_address_format(address):
     """Validate if the given address is a valid Ethereum address."""
     if not Web3.is_address(address):
@@ -76,4 +77,5 @@ def build_and_send_transaction(w3, contract, function_call, account, gas_limit=1
 def wait_for_receipt(w3, tx_hash):
     """Wait for transaction receipt and return it."""
     return w3.eth.wait_for_transaction_receipt(tx_hash)
+
 

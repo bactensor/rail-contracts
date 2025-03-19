@@ -50,18 +50,20 @@ def main():
     # Check command line arguments
     if len(sys.argv) != 3:
         print(
-            "Usage: python call_unbounded.py <contract_address> "
-            "<hex max 32 byte string>",
+            "Usage: python call_bounded.py <contract_address> "
+            "<hex data - max 32 byte string>",
             file=sys.stderr
         )
         print(
-            "Example: python call_unbounded.py 0x123... 1.5 0x45",
+            "Example: python call_bounded.py 0x123... 0x45ab",
             file=sys.stderr
         )
         sys.exit(1)
 
     contract_address = sys.argv[1]
-    data = sys.argv[2][2:]
+    data = sys.argv[2]
+    if data.startswith("0x"):
+        data = data[2:]
 
     w3 = get_web3_connection()
     account = get_account()

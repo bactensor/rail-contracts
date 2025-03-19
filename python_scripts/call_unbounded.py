@@ -55,13 +55,15 @@ def main():
             file=sys.stderr
         )
         print(
-            "Example: python call_unbounded.py 0x123... 1.5 456abc...",
+            "Example: python call_unbounded.py 0x123... 0x456abc...",
             file=sys.stderr
         )
         sys.exit(1)
 
     contract_address = sys.argv[1]
     data = sys.argv[2]
+    if data.startswith("0x"):
+        data = data[2:]
 
     w3 = get_web3_connection()
     account = get_account()
