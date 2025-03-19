@@ -4,7 +4,7 @@ import json
 from web3 import Web3
 import sys
 
-NUMBER_OF_RECENT_BLOCKS_TO_CHECK = 100
+NUMBER_OF_RECENT_BLOCKS_TO_CHECK = 256
 DEPLOYED_CONTRACT_FILE_PATH = '../deployed-contract.json'
 OUTPUT_FILE = 'transactions.csv'
 BOUNDED_SIGNATURE = 'checkpointBounded(bytes32)'
