@@ -125,6 +125,7 @@ To call contract's functions:
 
 ```npx hardhat --network subevm run scripts/callUnbounded.ts```
 
+Check out [`python_scripts`](#interaction-sample-scripts) for Python examples.
 
 Use [this block explorer](https://evm-testscan.dev.opentensor.ai) to track transactions on-chain.
 
