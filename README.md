@@ -59,7 +59,7 @@ export RPC_URL=https://evm-testnet.dev.opentensor.ai
 export PRIVATE_KEY=<your_private_key>
 
 pip install -r requirements.txt
-python3 python_scripts/call_bounded.py <contract address> <data>
+python call_bounded.py <contract address> <data>
 ```
 - `<data>` must be **at most 32 bytes** long.
 - Calls the **`checkpointBounded(bytes32)`** function of the smart contract.
@@ -73,7 +73,7 @@ export RPC_URL=https://evm-testnet.dev.opentensor.ai
 export PRIVATE_KEY=<your_private_key>
 
 pip install -r requirements.txt
-python3 python_scripts/call_unbounded.py <contract address> <data>
+python call_unbounded.py <contract address> <data>
 ```
 - `<data>` can be **any length** (higher gas cost for larger data).
 - Calls the **`checkpointUnbounded(bytes)`** function of the smart contract.
@@ -82,7 +82,7 @@ python3 python_scripts/call_unbounded.py <contract address> <data>
 ### Fetching contract calls
 ```
 pip install -r requirements.txt
-python3 python_scripts/filter_transactions.py <contract address> <bounded|unbounded>
+python filter_transactions.py <contract address> <bounded|unbounded>
 ```
 Where `bounded` tracks calls to `checkpointBounded(bytes32)` and `unbounded` tracks calls to `checkpointUnbounded(bytes)`.
 The script searches through the most recent 256 blocks. Decrease it in the script to get results faster. 
