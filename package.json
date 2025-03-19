@@ -11,7 +11,10 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.8",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "hardhat": "^2.22.17",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "hardhat": "^2.22.17"
+  },
+  "dependencies": {
+    "npx": "^10.2.2"
   }
 }

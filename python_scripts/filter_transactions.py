@@ -4,7 +4,7 @@ import json
 from web3 import Web3
 import sys
 
-NUMBER_OF_RECENT_BLOCKS_TO_CHECK = 256
+NUMBER_OF_RECENT_BLOCKS_TO_CHECK = 100
 OUTPUT_FILE = 'transactions.csv'
 BOUNDED_SIGNATURE = 'checkpointBounded(bytes32)'
 UNBOUNDED_SIGNATURE = 'checkpointUnbounded(bytes)'
