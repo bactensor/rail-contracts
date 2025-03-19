@@ -39,6 +39,8 @@ def put_h160_address(
               ```python
               private_key: SigningKey = SigningKey.from_string(bytes.fromhex(private_key_hex), curve=SECP256k1)
               ```
+    Raises: 
+        Subtensor API exceptions
     """
     public_key: bytes = private_key.get_verifying_key().to_string()
     signature: bytes = private_key.sign(wallet.hotkey.ss58_address.encode())
