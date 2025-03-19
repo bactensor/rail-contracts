@@ -29,6 +29,8 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
   ```sh
   RPC_URL=https://evm-testnet.dev.opentestnet.ai
   ```
+  RPC_URLs for testnet and mainnet can be found [here](https://docs.bittensor.com/evm-tutorials/subtensor-networks).  
+
 - **Devnet limitation**: Only the **last 256 blocks** are accessible. If `filter_transactions.py` does not return older data, this is expected.  
 
 - **Devnet block explorer**: Checkout already deployed [devnet contract](https://evm-testscan.dev.opentensor.ai/address/0xBA1DbF6d0847Fbc46bFE2A0375dB03257fE1D9a0).
