@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import hashlib
 from typing import TYPE_CHECKING
 
 from bittensor.core.extrinsics.serving import get_metadata, publish_metadata
 from ecdsa.curves import SECP256k1
 from ecdsa.errors import MalformedPointError
 from ecdsa.keys import BadSignatureError, SigningKey, VerifyingKey
+from eth_utils import keccak
 
 if TYPE_CHECKING:
     import bittensor_wallet
@@ -53,13 +53,9 @@ def put_h160_address(
         wait_for_finalization=True,
     )
 
-
-def hash160(data: bytes) -> bytes:
-    sha256_hash = hashlib.sha256(data).digest()
-    ripemd160 = hashlib.new('ripemd160')
-    ripemd160.update(sha256_hash)
-    return ripemd160.digest()
-
+def ethereum_h160(data: bytes) -> bytes:
+    hashed = keccak(data)
+    return hashed[-20:]
 
 def get_h160_address(subtensor: Subtensor, netuid: int, hotkey: str) -> str | None:
     """Get h160 address from knowledge commitment of a hotkey.
@@ -103,4 +99,4 @@ def get_h160_address(subtensor: Subtensor, netuid: int, hotkey: str) -> str | No
     except BadSignatureError:
         return None
 
-    return hash160(public_key_bytes).hex()
+    return '0x' + ethereum_h160(public_key_bytes).hex()
