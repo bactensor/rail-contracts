@@ -1,9 +1,11 @@
 ethPrivateKey.json
 transactions.csv
+deployed-contract.json
 python_scripts/transactions.csv
 
 node_modules
 .env
+.venv
 
 # Hardhat files
 /cache
@@ -19,3 +21,5 @@ node_modules
 
 # Hardhat Ignition default folder for deployments against a local node
 ignition/deployments/chain-31337
+
+__pycache__

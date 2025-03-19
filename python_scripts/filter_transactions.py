@@ -31,7 +31,7 @@ def main(signature):
 
     with open(OUTPUT_FILE, mode='w', newline='') as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(['sender', 'argument'])  # Write header
+        csv_writer.writerow(['block', 'sender', 'argument'])  # Write header
 
         current_block_num = w3.eth.block_number
         starting_block_num = current_block_num - NUMBER_OF_RECENT_BLOCKS_TO_CHECK
@@ -45,7 +45,7 @@ def main(signature):
                     argument = tx['input'].to_0x_hex()[BYTES_TO_SKIP[signature]:]  
                     sender = tx['from']
 
-                    csv_writer.writerow([sender, argument])
+                    csv_writer.writerow([block_number, sender, argument])
 
     print(f'Results saved to {OUTPUT_FILE}')
 
