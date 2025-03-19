@@ -10,29 +10,69 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
 - **Wallet requirement**:  
   - Users need an **H160 wallet** (Bittensor EVM-compatible).  
   - The **H160 must be linked to an SS58 hotkey**.  
-  - The Bittensor team is working on native support, but currently, **knowledge commitments** can be used (`h160-ss58-bridge/knowledge_commitment.py`).  
+  - The Bittensor team is working on native linking support, but currently, **knowledge commitments** can be used 
+    ([`h160-ss58-bridge/knowledge_commitment.py`](h160_ss58_bridge/knowledge_commitment.py)).  
   - The H160 must be **funded with TAO** for gas fees.  
 
 ## Wallet Setup  
 
 - **Recommended**: [Metamask Setup Guide](https://docs.bittensor.com/evm-tutorials/evm-mainnet-with-metamask-wallet)  
-- **Alternative (Python)**: Use [`eth-account`](https://pypi.org/project/eth-account/)  
+- **Alternative (Python)**: Use [`eth-account`](https://pypi.org/project/eth-account/)
 
 ### Funding the Wallet  
-- Follow **Step 3** in the [Bittensor EVM tutorial](https://docs.bittensor.com/evm-tutorials/evm-mainnet-with-metamask-wallet).  
+- Follow **Step 3** in the [Metamask Setup Guide](https://docs.bittensor.com/evm-tutorials/evm-mainnet-with-metamask-wallet).  
 - CLI-based funding method is being researched.  
 
 ## Deployment  
 
-- Uses [**Hardhat** and **npx**](#install-dependencies).  
+- Use [**Hardhat** and **npx**](#hardcat-and-npx-deployment).
+- Alternative (non-JS) method is being researched.  
 
-## Interaction Scripts (`python_scripts/`)  
+## [Interaction Sample Scripts](./python_scripts/)  
 
 | Script                  | Functionality |
 |-------------------------|--------------|
-| `call_bounded.py`       | Stores up to **32 bytes** of data |
-| `call_unbounded.py`     | Stores **unlimited data** (higher gas cost) |
-| `filter_transactions.py` | Scans on-chain data and outputs **who stored what & when** |
+| [`call_bounded.py`](./python_scripts/call_bounded.py)       | Stores up to **32 bytes** of data |
+| [`call_unbounded.py`](./python_scripts/call_unbounded.py)   | Stores **unlimited data** (higher gas cost) |
+| [`filter_transactions.py`](./python_scripts/filter_transactions.py) | Scans on-chain data and outputs **who stored what & when** |
+
+
+### Storing Data (Bounded)  
+
+```sh
+pip install -r requirements.txt
+python3 python_scripts/call_bounded.py <contract address> <data>
+```
+- `<data>` must be **at most 32 bytes** long.
+- Calls the **`checkpointBounded(bytes32)`** function of the smart contract.
+- Data will be stored **on-chain** and can be retrieved using [`filter_transactions.py`](./python_scripts/filter_transactions.py).
+
+
+### Storing Data (Unbounded)  
+
+```sh
+export RPC_URL=https://evm-testnet.dev.opentensor.ai
+export PRIVATE_KEY=<your_private_key>
+
+pip install -r requirements.txt
+python3 python_scripts/call_unbounded.py <contract address> <data>
+```
+- `<data>` can be **any length** (higher gas cost for larger data).
+- Calls the **`checkpointUnbounded(bytes)`** function of the smart contract.
+- Data will be stored **on-chain** and can be retrieved using [`filter_transactions.py`](./python_scripts/filter_transactions.py).
+
+### Fetching contract calls
+```
+export RPC_URL=https://evm-testnet.dev.opentensor.ai
+export PRIVATE_KEY=<your_private_key>
+
+pip install -r requirements.txt
+python3 python_scripts/filter_transactions.py <contract address> <bounded|unbounded>
+```
+Where `bounded` tracks calls to `checkpointBounded(bytes32)` and `unbounded` tracks calls to `checkpointUnbounded(bytes)`.
+The script searches through the most recent 256 blocks. Decrease it in the script to get results faster. 
+Script stores results in a file `transactions.csv`.
+
 
 ## EVM Devnet
   
@@ -83,11 +123,3 @@ To call contract's functions:
 
 Use [this block explorer](https://evm-testscan.dev.opentensor.ai) to track transactions on-chain.
 
-## Running the Python script for fetching contract calls
-```
-pip install -r requirements.txt
-python3 python_scripts/filter_transactions.py arg_name
-```
-Where `arg_name` is either `bounded`(tracks calls to `checkpointBounded(bytes32)`) or `unbounded`(tracks calls to `checkpointUnbounded(bytes)`).
-The script searches through the most recent 50 blocks. If you need more, edit the script code.
-Script stores results in a file `transactions.csv`.
