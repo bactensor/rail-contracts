@@ -64,9 +64,13 @@ def get_h160_address(subtensor: Subtensor, netuid: int, hotkey: str) -> str | No
         subtensor: subtensor
         netuid: subnet's netuid
         hotkey: hotkey to get h160 assosiated with
-    Returns
-        0x prefixed h160 address if all is well and the h160 assosiation is valid
-        None if anything is not ok
+    
+    Returns:
+        None if there is no association, data is corrupted or association verification fails
+        0x prefixed h160 address otherwise
+    
+    Raises: 
+        Subtensor API exceptions
     """
     metadata: dict = get_metadata(  # type: ignore
         subtensor, netuid, hotkey
