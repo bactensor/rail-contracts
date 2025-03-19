@@ -21,6 +21,7 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
 
 ### Funding the Wallet  
 - Follow **Step 3** in the [Metamask Setup Guide](https://docs.bittensor.com/evm-tutorials/evm-mainnet-with-metamask-wallet).  
+- You can also use [TAO Transfers bridge](https://bridge.bittensor.com/)
 - CLI-based funding method is being researched.  
 
 ## EVM Devnet
