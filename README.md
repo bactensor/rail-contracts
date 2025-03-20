@@ -44,7 +44,7 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
 - Install [Foundry](https://book.getfoundry.sh/).
 - Clone this repository.
 - Prepare [H160 wallet](#wallet-setup) and fund it (see [EVM devnet](#evm-devnet) faucet info)
-- Compile and deploy the contract: export `RPC_URL` and `DEPLOYER_PRIVATE_KEY` and use [`scripts/deploy.sh`](./scripts/deploy.sh)
+- Compile and deploy the contract: export `RPC_URL` and `DEPLOYER_PRIVATE_KEY` and run [`scripts/deploy.sh`](./scripts/deploy.sh):
   ```sh
   export RPC_URL=https://evm-testnet.dev.opentensor.ai
   export PRIVATE_KEY=<your_private_key>
@@ -105,10 +105,12 @@ The bridge **associates an H160 wallet with an SS58 hotkey** by storing the **co
 ### How It Works
 
 1. Data Storage in Knowledge Commitment
-  - The **H160 public key** and a **message signed with the H160 private key** are stored inside the knowledge commitment.
-  - The **message is the SS58 hotkey**, making the process more mistake-resistant.
+    - The **H160 public key** and a **message signed with the H160 private key** are stored inside the knowledge commitment.
+    - The **message is the SS58 hotkey**, making the process more mistake-resistant.
 
 2. Verification
-  - The **H160 public key** (stored in the commitment) can be used to **verify the signature**, proving ownership of the **H160 private key**.
-  - The **EVM address** is the **last 20 bytes** of the **Keccak-256 hash** of the public key.
+    - The **H160 public key** (stored in the commitment) can be used to **verify the signature**, proving ownership of the **H160 private key**.
+    - The **EVM address** is the **last 20 bytes** of the **Keccak-256 hash** of the public key.
 
+### Sample code
+Check out [sample code](./h160_ss58_bridge/knowledge_commitment.py) doing that.
