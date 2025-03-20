@@ -10,6 +10,7 @@ from eth_account import Account
 def load_contract_abi():
     """Load the contract ABI from the artifacts file."""
     try:
+        #with open('../out/Checkpoint.sol/Checkpoint.json', 'r') as f:
         with open('../deployed-contract.json', 'r') as f:
             contract_json = json.load(f)
             return contract_json['abi']

@@ -1,0 +1,6 @@
+[profile.default]
+src = "contracts"
+out = "out"
+
+[dependencies]
+forge-std = "1.9.6"
