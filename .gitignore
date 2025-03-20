@@ -1,24 +1,11 @@
-ethPrivateKey.json
 transactions.csv
-python_scripts/transactions.csv
 
-node_modules
 .env
 .venv
 
-# Hardhat files
-/cache
-/artifacts
-
-# TypeChain files
-/typechain
-/typechain-types
-
-# solidity-coverage files
-/coverage
-/coverage.json
-
-# Hardhat Ignition default folder for deployments against a local node
-ignition/deployments/chain-31337
-
 __pycache__
+
+
+# Compiler files
+cache/
+out/
