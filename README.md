@@ -11,7 +11,8 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
   - Users need an **H160 wallet** (Bittensor EVM-compatible).  
   - The **H160 must be linked to an SS58 hotkey**.  
   - The Bittensor team is working on native linking support, but currently, **knowledge commitments** can be used 
-    ([`h160-ss58-bridge/knowledge_commitment.py`](h160_ss58_bridge/knowledge_commitment.py)).  
+    ([`h160-ss58-bridge/knowledge_commitment.py`](h160_ss58_bridge/knowledge_commitment.py)).
+    Check out the [H160-SS58 bridge](#h160-ss58-bridge) section to learn how it works.
   - The H160 must be **funded with TAO** for gas fees.  
 
 ## Wallet Setup  
@@ -88,6 +89,20 @@ python filter_transactions.py <contract address> <bounded|unbounded>
 Where `bounded` tracks calls to `checkpointBounded(bytes32)` and `unbounded` tracks calls to `checkpointUnbounded(bytes)`.
 The script searches through the most recent 256 blocks. Decrease it in the script to get results faster. 
 Script stores results in a file `transactions.csv`.
+
+## H160-SS58 Bridge
+
+The bridge **associates an H160 wallet with an SS58 hotkey** by storing the **connection proof** in the **UID's knowledge commitment**.
+
+### How It Works
+
+1. Data Storage in Knowledge Commitment
+  - The **H160 public key** and a **message signed with the H160 private key** are stored inside the knowledge commitment.
+  - The **message is the SS58 hotkey**, making the process more mistake-resistant.
+
+1. Verification
+  - The **H160 public key** (stored in the commitment) can be used to **verify the signature**, proving ownership of the **H160 private key**.
+  - The **EVM address** is the **last 20 bytes** of the **Keccak-256 hash** of the public key.
 
 
 # Hardcat and npx deployment
