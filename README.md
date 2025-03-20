@@ -6,7 +6,7 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
 
 - **Deployed by**: A subnet owner  
 - **Used by**: Miners & validators  
-- **Access**: Data is visible via block explorers or via [`python_scripts/filter_transactions.py`](python_scripts/filter_transactions.py).  
+- **Access**: Data is visible via block explorers or via [`scripts/filter_transactions.py`](scripts/filter_transactions.py).  
 - **Wallet requirement**:  
   - Users need an **H160 wallet** (Bittensor EVM-compatible).  
   - The **H160 must be linked to an SS58 hotkey**.  
@@ -35,23 +35,31 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
 
 - **Devnet limitation**: Only the **last 256 blocks** are accessible. If `filter_transactions.py` does not return older data, this is expected.  
 
-- **Devnet block explorer**: Checkout already deployed [devnet contract](https://evm-testscan.dev.opentensor.ai/address/0xBA1DbF6d0847Fbc46bFE2A0375dB03257fE1D9a0).
-  Its abi can be found in [`deployed-contract.json`](deployed-contract.json)
+- **Devnet block explorer**: Check out already deployed [devnet contract](https://evm-testscan.dev.opentensor.ai/address/0xBA1DbF6d0847Fbc46bFE2A0375dB03257fE1D9a0).
+  The contract ABI is available in [`deployed-contract.json`](deployed-contract.json)
 
 - **Devnet funds**: You need to have some TAO to deploy and send transactions. You can get devnet TAO from the [faucet](https://evm-testnet.dev.opentensor.ai/faucet).
 
-## Deployment  
+## Deployment
+- Install [Foundry](https://book.getfoundry.sh/).
+- Clone this repository.
+- Prepare [H160 wallet](#wallet-setup) and fund it (see [EVM devnet](#evm-devnet) faucet info)
+- Compile and deploy the contract: export `RPC_URL` and `DEPLOYER_PRIVATE_KEY` and run [`scripts/deploy.sh`](./scripts/deploy.sh):
+  ```sh
+  export RPC_URL=https://evm-testnet.dev.opentensor.ai
+  export PRIVATE_KEY=<your_private_key>
 
-- Use [**Hardhat** and **npx**](#hardcat-and-npx-deployment).
-- Alternative (non-JS) method is being researched.  
+  scripts/deploy.sh
+  ```
+- Record the deployed contract address - you will be need it later. It can also be found on a block explorer for the network you deployed on.
 
-## [Interaction Sample Scripts](./python_scripts/)  
+## Interaction Sample Scripts
 
 | Script                  | Functionality |
 |-------------------------|--------------|
-| [`call_bounded.py`](./python_scripts/call_bounded.py)       | Stores up to **32 bytes** of data |
-| [`call_unbounded.py`](./python_scripts/call_unbounded.py)   | Stores **unlimited data** (higher gas cost) |
-| [`filter_transactions.py`](./python_scripts/filter_transactions.py) | Scans on-chain data and outputs **who stored what & when** |
+| [`call_bounded.py`](./scripts/call_bounded.py)       | Stores up to **32 bytes** of data |
+| [`call_unbounded.py`](./scripts/call_unbounded.py)   | Stores **unlimited data** (higher gas cost) |
+| [`filter_transactions.py`](./scripts/filter_transactions.py) | Scans on-chain data and outputs **who stored what & when** |
 
 
 ### Storing Data (Bounded)  
@@ -82,12 +90,12 @@ python call_unbounded.py <contract address> <data>
 - Data will be stored **on-chain** and can be retrieved using [`filter_transactions.py`](#fetching-contract-calls).
 
 ### Fetching contract calls
-```
+```sh
 pip install -r requirements.txt
 python filter_transactions.py <contract address> <bounded|unbounded>
 ```
 Where `bounded` tracks calls to `checkpointBounded(bytes32)` and `unbounded` tracks calls to `checkpointUnbounded(bytes)`.
-The script searches through the most recent 256 blocks. Decrease it in the script to get results faster. 
+The script searches through the most recent 256 blocks. Adjust it in the script to get results faster.
 Script stores results in a file `transactions.csv`.
 
 ## H160-SS58 Bridge
@@ -96,52 +104,14 @@ The bridge **associates an H160 wallet with an SS58 hotkey** by storing the **co
 
 ### How It Works
 
-1. Data Storage in Knowledge Commitment
+**Data Storage in Knowledge Commitment**
   - The **H160 public key** and a **message signed with the H160 private key** are stored inside the knowledge commitment.
   - The **message is the SS58 hotkey**, making the process more mistake-resistant.
 
-1. Verification
+**Verification**
   - The **H160 public key** (stored in the commitment) can be used to **verify the signature**, proving ownership of the **H160 private key**.
   - The **EVM address** is the **last 20 bytes** of the **Keccak-256 hash** of the public key.
 
-
-# Hardcat and npx deployment
-
-## Install dependencies
-
-You need Node v18.20.3 with npm v10.7.0 to run the scripts.
-
-It's recommended to install them via [nvm (Node Version Manager)](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script).
-After installing `nvm`, do this in the repo root directory:
-```
-nvm install v18
-nvm use 18
-npm install
-```
-
-## Compiling the contract and interacting with it
-To compile the contract and run scripts, you need to provide your own private H160 private key for Bittensor. That's a 64 hex digit string not prefixed with `0x`.
-Put it into the `ethPrivateKey.json` file. You can create an account using [MetaMask](https://docs.bittensor.com/evm-tutorials/evm-testnet-with-metamask-wallet).
-
-You need to have some TAO to deploy and send transactions. You can get testnet TAO from [here.](https://evm-testnet.dev.opentensor.ai/faucet)
-
-To compile the contract:
-
-```npx hardhat compile```
-
-To deploy a contract:
-
-```npx hardhat --network subevm run scripts/deploy.ts```
-
-The contract's address on testnet and ABI are stored in `deployed-contract.json`.
-
-To call contract's functions:
-
-```npx hardhat --network subevm run scripts/callBounded.ts```
-
-```npx hardhat --network subevm run scripts/callUnbounded.ts```
-
-Check out [`python_scripts`](#interaction-sample-scripts) for Python examples.
-
-Use [this block explorer](https://evm-testscan.dev.opentensor.ai) to track transactions on-chain.
+### Sample code
+Check out the [sample code](./h160_ss58_bridge/knowledge_commitment.py) demonstrating this process.
 
