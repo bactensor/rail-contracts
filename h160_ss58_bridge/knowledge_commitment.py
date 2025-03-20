@@ -13,6 +13,34 @@ if TYPE_CHECKING:
     from bittensor import Subtensor
 
 
+def create_knowledge_commitment_data(hotkey: str, private_key: SigningKey) -> bytes:
+    public_key: bytes = private_key.get_verifying_key().to_string()
+    signature: bytes = private_key.sign(hotkey.encode())
+    return public_key + signature
+
+
+def ethereum_h160_address(data: bytes) -> bytes:
+    hashed = keccak(data)
+    return to_checksum_address(hashed[-20:])
+
+
+def unpack_knowledge_commitment_data(hotkey: str, data: bytes) -> str | None:
+    public_key_bytes: bytes = data[:64]
+    try:
+        public_key: VerifyingKey = VerifyingKey.from_string(public_key_bytes, curve=SECP256k1)
+    except MalformedPointError:
+        return None
+
+    signature: bytes = data[64:]
+    try:
+        if not public_key.verify(signature, hotkey.encode()):
+            return None
+    except BadSignatureError:
+        return None
+
+    return ethereum_h160_address(public_key_bytes)
+
+
 def put_h160_address(
     wallet: bittensor_wallet.Wallet,
     subtensor: Subtensor,
@@ -42,9 +70,7 @@ def put_h160_address(
     Raises: 
         Subtensor API exceptions
     """
-    public_key: bytes = private_key.get_verifying_key().to_string()
-    signature: bytes = private_key.sign(wallet.hotkey.ss58_address.encode())
-    data: bytes = public_key + signature
+    data: bytes = create_knowledge_commitment_data(wallet.hotkey.ss58_address, private_key)
     publish_metadata(
         subtensor,
         wallet,
@@ -55,9 +81,6 @@ def put_h160_address(
         wait_for_finalization=True,
     )
 
-def ethereum_h160_address(data: bytes) -> bytes:
-    hashed = keccak(data)
-    return to_checksum_address(hashed[-20:])
 
 def get_h160_address(subtensor: Subtensor, netuid: int, hotkey: str) -> str | None:
     """Get h160 address from knowledge commitment of a hotkey.
@@ -92,17 +115,17 @@ def get_h160_address(subtensor: Subtensor, netuid: int, hotkey: str) -> str | No
     except (TypeError, LookupError):
         return None
 
-    public_key_bytes: bytes = data[:64]
-    try:
-        public_key: VerifyingKey = VerifyingKey.from_string(public_key_bytes, curve=SECP256k1)
-    except MalformedPointError:
-        return None
+    return unpack_knowledge_commitment_data(hotkey, data)
 
-    signature: bytes = data[64:]
-    try:
-        if not public_key.verify(signature, hotkey.encode()):
-            return None
-    except BadSignatureError:
-        return None
 
-    return ethereum_h160_address(public_key_bytes)
+def test_bridge_data() -> None:
+    from eth_account import Account
+    account = Account.create('KEYSMASH FJAFJKLDSKF7JKFDJ 1530')
+    address = account.address
+    signing_key = SigningKey.from_string(account.key, curve=SECP256k1)
+    data = create_knowledge_commitment_data("test_hotkey", signing_key)
+    unpacked_address = unpack_knowledge_commitment_data("test_hotkey", data)
+    assert address == unpacked_address
+
+
+test_bridge_data()
