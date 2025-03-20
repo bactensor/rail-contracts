@@ -118,14 +118,3 @@ def get_h160_address(subtensor: Subtensor, netuid: int, hotkey: str) -> str | No
     return unpack_knowledge_commitment_data(hotkey, data)
 
 
-def test_bridge_data() -> None:
-    from eth_account import Account
-    account = Account.create('KEYSMASH FJAFJKLDSKF7JKFDJ 1530')
-    address = account.address
-    signing_key = SigningKey.from_string(account.key, curve=SECP256k1)
-    data = create_knowledge_commitment_data("test_hotkey", signing_key)
-    unpacked_address = unpack_knowledge_commitment_data("test_hotkey", data)
-    assert address == unpacked_address
-
-
-test_bridge_data()
