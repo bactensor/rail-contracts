@@ -5,7 +5,6 @@ transactions.csv
 
 __pycache__
 
-
 # Compiler files
 cache/
 out/
