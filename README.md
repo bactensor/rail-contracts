@@ -6,7 +6,7 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
 
 - **Deployed by**: A subnet owner  
 - **Used by**: Miners & validators  
-- **Access**: Data is visible via block explorers or via [`python_scripts/filter_transactions.py`](python_scripts/filter_transactions.py).  
+- **Access**: Data is visible via block explorers or via [`scripts/filter_transactions.py`](scripts/filter_transactions.py).  
 - **Wallet requirement**:  
   - Users need an **H160 wallet** (Bittensor EVM-compatible).  
   - The **H160 must be linked to an SS58 hotkey**.  
@@ -44,13 +44,13 @@ Rail Smart Contract enables **cheap data storage** on the **Bittensor blockchain
 - Use [**Hardhat** and **npx**](#hardcat-and-npx-deployment).
 - Alternative (non-JS) method is being researched.  
 
-## [Interaction Sample Scripts](./python_scripts/)  
+## [Interaction Sample Scripts](./scripts/)  
 
 | Script                  | Functionality |
 |-------------------------|--------------|
-| [`call_bounded.py`](./python_scripts/call_bounded.py)       | Stores up to **32 bytes** of data |
-| [`call_unbounded.py`](./python_scripts/call_unbounded.py)   | Stores **unlimited data** (higher gas cost) |
-| [`filter_transactions.py`](./python_scripts/filter_transactions.py) | Scans on-chain data and outputs **who stored what & when** |
+| [`call_bounded.py`](./scripts/call_bounded.py)       | Stores up to **32 bytes** of data |
+| [`call_unbounded.py`](./scripts/call_unbounded.py)   | Stores **unlimited data** (higher gas cost) |
+| [`filter_transactions.py`](./scripts/filter_transactions.py) | Scans on-chain data and outputs **who stored what & when** |
 
 
 ### Storing Data (Bounded)  
@@ -126,7 +126,7 @@ To call contract's functions:
 
 ```npx hardhat --network subevm run scripts/callUnbounded.ts```
 
-Check out [`python_scripts`](#interaction-sample-scripts) for Python examples.
+Check out [`scripts`](#interaction-sample-scripts) for Python examples.
 
 Use [this block explorer](https://evm-testscan.dev.opentensor.ai) to track transactions on-chain.
 
