@@ -11,14 +11,20 @@
 #   export RPC_URL="https://evm-testnet.dev.opentensor.ai"
 #
 # Then run the script:
-#   ./deploy.sh
+#   ./deploy_map.sh 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
+#
+# 1. admin_h160_address: Ethereum address of the admin (H160 format)
+#    Example: 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
 
-# Check if there are no arguments
-if [ "$#" -ne 0 ]; then
-    echo "Error: Too many arguments"
-    echo "Usage: $0"
+
+if [ "$#" -ne 1 ]; then
+    echo "Error: Required arguments missing"
+    echo "Usage: $0 <admin_h160_address>"
     exit 1
 fi
+
+# Assign command line arguments to variables
+ADMIN_ADDRESS=$1
 
 if [ -z "$DEPLOYER_PRIVATE_KEY" ]; then
     echo "Error: DEPLOYER_PRIVATE_KEY environment variable is not set"
@@ -32,7 +38,8 @@ if [ -z "$RPC_URL" ]; then
 fi
 
 # Execute the forge create command
-forge create contracts/Checkpoint.sol:Checkpoint \
+forge create src/Map.sol:Map \
     --broadcast \
     --rpc-url "$RPC_URL" \
     --private-key "$DEPLOYER_PRIVATE_KEY" \
+    --constructor-args "$ADMIN_ADDRESS"

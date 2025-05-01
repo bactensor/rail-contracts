@@ -1,6 +1,4 @@
 import csv
-import hashlib
-import json
 from web3 import Web3
 import sys
 
