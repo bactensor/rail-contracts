@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sys
-from web3 import Web3
 from common import (
     load_contract_abi,
     get_web3_connection,

@@ -114,4 +114,3 @@ The bridge **associates an H160 wallet with an SS58 hotkey** by storing the **co
 
 ### Sample code
 Check out the [sample code](./h160_ss58_bridge/knowledge_commitment.py) demonstrating this process.
-
