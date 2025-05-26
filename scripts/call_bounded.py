@@ -24,7 +24,7 @@ def call_bounded(w3, account, contract_address, data: bytes):
     """
     validate_address_format(contract_address)
 
-    contract_abi = load_contract_abi()
+    contract_abi = load_contract_abi('../out/Checkpoint.sol/Checkpoint.json')
     contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
     try:
