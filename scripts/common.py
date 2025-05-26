@@ -5,14 +5,14 @@ from web3 import Web3
 from eth_account import Account
 
 
-def load_contract_abi():
+def load_contract_abi(abi_json_path):
     """Load the contract ABI from the artifacts file."""
     try:
-        with open('../out/Checkpoint.sol/Checkpoint.json', 'r') as f:
+        with open(abi_json_path, 'r') as f:
             contract_json = json.load(f)
             return contract_json['abi']
     except FileNotFoundError:
-        print("Error: Contract ABI not found.", file=sys.stderr)
+        print(f"Error: Contract ABI not found at {abi_json_path}", file=sys.stderr)
         sys.exit(1)
 
 
