@@ -1,22 +1,34 @@
-import os
-import sys
 import json
-from web3 import Web3
+import logging
+import os
+import pathlib
+import sys
+
 from eth_account import Account
+from eth_account.signers.local import LocalAccount
+from web3 import Web3
 
 
-def load_contract_abi():
+logger = logging.getLogger(__name__)
+
+
+def load_contract_abi(abi_filename: str):
     """Load the contract ABI from the artifacts file."""
+    abi_path = pathlib.Path(__file__).parent.parent / "out" / abi_filename
+    if not abi_path.exists():
+        print(f"Error: ABI file {abi_path} does not exist", file=sys.stderr)
+        sys.exit(1)
+
     try:
-        with open('../out/Checkpoint.sol/Checkpoint.json', 'r') as f:
+        with open(abi_path, 'r') as f:
             contract_json = json.load(f)
             return contract_json['abi']
     except FileNotFoundError:
-        print("Error: Contract ABI not found.", file=sys.stderr)
+        print(f"Error: Contract ABI not found at {str(abi_path)}", file=sys.stderr)
         sys.exit(1)
 
 
-def get_web3_connection():
+def get_web3_connection() -> Web3:
     """Get Web3 connection from RPC_URL environment variable."""
     rpc_url = os.getenv('RPC_URL')
     if not rpc_url:
@@ -30,7 +42,7 @@ def get_web3_connection():
     return w3
 
 
-def get_account():
+def get_account() -> LocalAccount:
     """Get account from PRIVATE_KEY environment variable."""
     private_key = os.getenv('PRIVATE_KEY')
     if not private_key:
@@ -48,7 +60,7 @@ def validate_address_format(address):
 
 def build_and_send_transaction(w3, contract, function_call, account, gas_limit=100000, value=0):
     """Build, sign and send a transaction.
-    
+
     Args:
         w3: Web3 instance
         contract: Contract instance
@@ -68,12 +80,10 @@ def build_and_send_transaction(w3, contract, function_call, account, gas_limit=1
 
     signed_txn = w3.eth.account.sign_transaction(transaction, account.key)
     tx_hash = w3.eth.send_raw_transaction(signed_txn.raw_transaction)
-    print(f"Transaction sent: {tx_hash.hex()}", file=sys.stderr)
+    logger.debug(f"Transaction sent: {tx_hash.hex()}", file=sys.stderr)
     return tx_hash
 
 
 def wait_for_receipt(w3, tx_hash):
     """Wait for transaction receipt and return it."""
     return w3.eth.wait_for_transaction_receipt(tx_hash)
-
-
