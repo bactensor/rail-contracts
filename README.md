@@ -114,3 +114,59 @@ The bridge **associates an H160 wallet with an SS58 hotkey** by storing the **co
 
 ### Sample code
 Check out the [sample code](./h160_ss58_bridge/knowledge_commitment.py) demonstrating this process.
+
+## Key-Value Storage with Map.sol
+
+### About Map.sol
+
+`Map.sol` is a smart contract included in this repository that enables **key-value storage** on the Bittensor EVM chain. It allows users to store, update, and retrieve arbitrary data mapped to specific keys, making it useful for decentralized applications that require persistent on-chain mappings.
+
+**Key Features:**
+- **Generic key-value storage:** Store any data (as bytes) under a unique key (bytes32).
+- **Permissioned writes:** Only authorized addresses can write or update values, depending on contract configuration.
+- **On-chain retrieval:** Anyone can read the stored values using the contract's public view functions.
+
+The contract source is located at [`contracts/Map.sol`](./contracts/Map.sol).
+
+### Using Map.sol CLI
+
+`map_cli` is a Python command-line tool provided in the `scripts/` directory for interacting with the deployed `Map.sol` contract. It allows you to set and get key-value pairs directly from your terminal.
+
+#### Setup
+
+1. **Install dependencies:**
+```sh
+$ pip install -r requirements.txt
+```
+
+2. **Set environment variables:**
+```sh
+$ export RPC_URL=https://evm-testnet.dev.opentensor.ai
+$ export PRIVATE_KEY=<your_private_key>
+```
+
+#### Commands
+
+- **Set a value:**
+```sh
+$ python scripts/map_cli.py set <contract_address> --key <key> --value <value>
+```
+
+- **Get a value:**
+```sh
+$ python scripts/map_cli.py get <contract_address> <key>
+```
+- Retrieves the value stored under the given key.
+
+#### Example
+
+```sh
+$ python scripts/map_cli.py 0xYourContractAddress set --key mykey --value "Hello, world!"
+$ python scripts/map_cli.py 0xYourContractAddress get --key mykey
+```
+
+This will store `"Hello, world!"` under the key `"mykey"` and then retrieve it.
+
+**Note:** Make sure your wallet is funded with TAO for gas fees, and that the contract address is correct for your deployment.
+
+For more details, see the [`scripts/map_cli.py`](./scripts/map_cli.py) source code and the [`contracts/Map.sol`](./contracts/Map.sol) contract.
