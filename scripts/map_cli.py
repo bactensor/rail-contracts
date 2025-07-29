@@ -5,6 +5,7 @@ import datetime
 import json
 import logging
 import sys
+from pathlib import Path
 from typing import Any
 
 import requests
@@ -12,7 +13,6 @@ from common import (
     build_and_send_transaction,
     get_account,
     get_web3_connection,
-    load_contract_abi,
     validate_address_format,
     wait_for_receipt,
 )
@@ -51,6 +51,11 @@ def build_config_urls(env: str, service: str) -> list[str]:
     ]
 
 
+def load_contract_abi():
+    path = Path(__file__).parent.parent / "map_abi.json"
+    return json.loads(path.read_bytes())
+
+
 def store_value(
     w3: Web3, account: LocalAccount, contract_address: str, key: str, value: str
 ):
@@ -68,7 +73,7 @@ def store_value(
     """
     validate_address_format(contract_address)
 
-    contract_abi = load_contract_abi("Map.sol/Map.json")
+    contract_abi = load_contract_abi()
     contract = w3.eth.contract(
         address=w3.to_checksum_address(contract_address), abi=contract_abi
     )
@@ -95,7 +100,7 @@ def read_value(w3, contract_address: str, key: str):
     """
     validate_address_format(contract_address)
 
-    abi = load_contract_abi("../out/Map.sol/Map.json")
+    abi = load_contract_abi()
     contract = w3.eth.contract(address=contract_address, abi=abi)
     value = contract.functions.value(key).call()
     return value
