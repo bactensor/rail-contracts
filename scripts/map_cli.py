@@ -113,7 +113,7 @@ class ConfigSyncer:
         self.w3 = w3
         self.account = account
         self.contract_address = contract_address
-        self.stats = {"stored": 0, "skipped": 0, "failed": 0}
+        self.stats = {"stored": 0, "skipped": 0, "failed": 0, "unchanged": 0}
 
     def fetch_config(self, url: str) -> dict:
         """
@@ -143,17 +143,28 @@ class ConfigSyncer:
         return param_item.effective_from <= now
 
     def store_param(self, param_key: str, param_item: ParamItem) -> bool:
-        """Store a parameter in the Map contract."""
+        """Store a parameter in the Map contract only if it has changed."""
+        new_value = str(param_item.value)
         try:
+            # Read the current value from the contract
+            current_value = read_value(self.w3, self.contract_address, param_key)
+
+            # Compare current value with new value
+            if current_value == new_value:
+                logger.debug(f"Config {param_key}={new_value} unchanged, skipping store")
+                self.stats["unchanged"] += 1
+                return True
+
+            # Value has changed, store the new value
             store_value(
                 w3=self.w3,
                 account=self.account,
                 contract_address=self.contract_address,
                 key=param_key,
-                value=str(param_item.value),
+                value=new_value,
             )
 
-            logger.info(f"Set config {param_key}={param_item.value}")
+            logger.info(f"Set config {param_key}={param_item.value} (was: {current_value})")
 
             self.stats["stored"] += 1
             return True
@@ -193,6 +204,7 @@ class ConfigSyncer:
     def print_stats(self) -> None:
         logger.info(
             f"Sync complete - Stored: {self.stats['stored']}, "
+            f"Unchanged: {self.stats['unchanged']}, "
             f"Skipped: {self.stats['skipped']}, Failed: {self.stats['failed']}"
         )
 
