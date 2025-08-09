@@ -169,8 +169,8 @@ class ConfigSyncer:
             self.stats["stored"] += 1
             return True
 
-        except Exception as e:
-            logger.warning(f"Failed to set config {param_key}={param_item.value}: {e}")
+        except Exception:
+            logger.exception(f"Failed to set config {param_key}={param_item.value}")
             self.stats["failed"] += 1
             return False
 
