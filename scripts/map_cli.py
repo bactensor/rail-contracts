@@ -37,6 +37,15 @@ class Param(BaseModel):
     description: str
     items: list[ParamItem]
 
+    def get_effective_item(self) -> ParamItem | None:
+        now = datetime.datetime.now(datetime.UTC)
+        effective_item = None
+        for param_item in self.items:
+            if param_item.effective_from is None or param_item.effective_from <= now:
+                # if multiple items match the time limit, we consider the last one as effective
+                effective_item = param_item
+        return effective_item
+
 
 class ConfigFetchError(Exception):
     """Custom exception for configuration fetch errors."""
@@ -134,14 +143,6 @@ class ConfigSyncer:
         except json.JSONDecodeError as e:
             raise ConfigFetchError(f"Invalid JSON format in config from {url}") from e
 
-    def is_param_effective(self, param_item: ParamItem) -> bool:
-        """Check if a parameter item is currently effective."""
-        if param_item.effective_from is None:
-            return True
-
-        now = datetime.datetime.now(datetime.UTC)
-        return param_item.effective_from <= now
-
     def store_param(self, param_key: str, param_item: ParamItem) -> bool:
         """Store a parameter in the Map contract only if it has changed."""
         new_value = str(param_item.value)
@@ -169,8 +170,8 @@ class ConfigSyncer:
             self.stats["stored"] += 1
             return True
 
-        except Exception:
-            logger.exception(f"Failed to set config {param_key}={param_item.value}")
+        except Exception as e:
+            logger.error(f"Failed to set config {param_key}={param_item.value}: {e!r}")
             self.stats["failed"] += 1
             return False
 
@@ -191,14 +192,8 @@ class ConfigSyncer:
                 self.stats["failed"] += 1
                 continue
 
-            for param_item in param.items:
-                if not self.is_param_effective(param_item):
-                    logger.debug(
-                        f"Skipping non-effective config {param_key}={param_item.value}"
-                    )
-                    self.stats["skipped"] += 1
-                    continue
-
+            param_item = param.get_effective_item()
+            if param_item is not None:
                 self.store_param(param_key, param_item)
 
     def print_stats(self) -> None:
