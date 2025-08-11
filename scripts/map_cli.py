@@ -173,7 +173,7 @@ class ConfigSyncer:
 
                 item = param.get_effective_item()
                 if item is not None:
-                    full_url_config[key] = str(item.value)
+                    full_url_config[key] = json.dumps(item.value)
 
         config_keys = list(full_url_config.keys())
         current_map_values = read_values(self.w3, self.contract_address, config_keys)
