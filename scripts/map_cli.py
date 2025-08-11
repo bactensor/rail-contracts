@@ -17,7 +17,7 @@ from common import (
     wait_for_receipt,
 )
 from eth_account.signers.local import LocalAccount
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from web3 import Web3
 
 
@@ -96,6 +96,20 @@ def store_value(
     return receipt
 
 
+def read_values(w3: Web3, contract_address: str, keys: list[str]) -> list[str]:
+    logger.info(f"Reading values from {contract_address} for keys: {keys}")
+    validate_address_format(contract_address)
+    abi = load_contract_abi()
+    contract = w3.eth.contract(address=contract_address, abi=abi)
+
+    with w3.batch_requests() as batch:
+        for key in keys:
+            batch.add(contract.functions.value(key))
+        results = batch.execute()
+
+    return results
+
+
 def read_value(w3, contract_address: str, key: str):
     """
     Read a value from the Map contract for a given key.
@@ -133,6 +147,7 @@ class ConfigSyncer:
         Returns:
             Parsed JSON configuration data.
         """
+        logger.info(f"Fetching config from {url}")
         try:
             headers = {"User-Agent": "backend-developers-ltd"}
             response = requests.get(url, headers=headers)
@@ -143,58 +158,45 @@ class ConfigSyncer:
         except json.JSONDecodeError as e:
             raise ConfigFetchError(f"Invalid JSON format in config from {url}") from e
 
-    def store_param(self, param_key: str, param_item: ParamItem) -> bool:
-        """Store a parameter in the Map contract only if it has changed."""
-        new_value = str(param_item.value)
-        try:
-            # Read the current value from the contract
-            current_value = read_value(self.w3, self.contract_address, param_key)
+    def sync_config_from_urls(self, config_urls: list[str]) -> None:
+        """Sync configuration from a list of URLs to the Map contract."""
 
-            # Compare current value with new value
-            if current_value == new_value:
-                logger.debug(f"Config {param_key}={new_value} unchanged, skipping store")
+        full_url_config: dict[str, str] = {}
+        for config_url in config_urls:
+            config_data = self.fetch_config(config_url)
+            for key, value in config_data.items():
+                try:
+                    param = Param.model_validate(value)
+                except ValidationError as e:
+                    logger.warning(f"Invalid param format for {key}: {e}")
+                    continue
+
+                item = param.get_effective_item()
+                if item is not None:
+                    full_url_config[key] = str(item.value)
+
+        config_keys = list(full_url_config.keys())
+        current_map_values = read_values(self.w3, self.contract_address, config_keys)
+
+        for key, map_value in zip(config_keys, current_map_values):
+            new_value = full_url_config[key]
+            if new_value != map_value:
+                try:
+                    store_value(
+                        w3=self.w3,
+                        account=self.account,
+                        contract_address=self.contract_address,
+                        key=key,
+                        value=new_value,
+                    )
+                    logger.info(f"Set config {key}={new_value} (was: {map_value})")
+                    self.stats["stored"] += 1
+                except Exception as e:
+                    logger.error(f"Failed to set config {key}={new_value}: {e!r}")
+                    self.stats["failed"] += 1
+            else:
+                logger.info(f"Config {key}={new_value} unchanged, skipping store")
                 self.stats["unchanged"] += 1
-                return True
-
-            # Value has changed, store the new value
-            store_value(
-                w3=self.w3,
-                account=self.account,
-                contract_address=self.contract_address,
-                key=param_key,
-                value=new_value,
-            )
-
-            logger.info(f"Set config {param_key}={param_item.value} (was: {current_value})")
-
-            self.stats["stored"] += 1
-            return True
-
-        except Exception as e:
-            logger.error(f"Failed to set config {param_key}={param_item.value}: {e!r}")
-            self.stats["failed"] += 1
-            return False
-
-    def sync_config_from_url(self, config_url: str) -> None:
-        """Sync configuration from a single URL to the Map contract."""
-        logger.info(f"Syncing config from: {config_url}")
-
-        config_data = self.fetch_config(config_url)
-
-        for param_key, raw_param in config_data.items():
-            if not param_key.startswith("DYNAMIC_"):
-                continue
-
-            try:
-                param = Param.model_validate(raw_param)
-            except Exception as e:
-                logger.warning(f"Invalid param format for {param_key}: {e}")
-                self.stats["failed"] += 1
-                continue
-
-            param_item = param.get_effective_item()
-            if param_item is not None:
-                self.store_param(param_key, param_item)
 
     def print_stats(self) -> None:
         logger.info(
@@ -255,15 +257,8 @@ class CLICommands:
         """
         account = get_account()
         syncer = ConfigSyncer(self.w3, account, self.contract_address)
-
-        try:
-            config_urls = build_config_urls(env, service)
-            for config_url in config_urls:
-                syncer.sync_config_from_url(config_url)
-        except Exception as e:
-            logger.warning(f"Error syncing config: {e}", exc_info=True)
-            sys.exit(1)
-
+        config_urls = build_config_urls(env, service)
+        syncer.sync_config_from_urls(config_urls)
         syncer.print_stats()
 
 
